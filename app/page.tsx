@@ -1,22 +1,52 @@
-"use client";
+'use client'
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { usePagesContext } from '@/lib/context'
+import { getSetting } from '@/lib/db'
 
-export default function Home() {
-  const [status, setStatus] = useState("Checking Supabase...");
+export default function HomePage() {
+  const router = useRouter()
+  const { pages, isLoading } = usePagesContext()
 
   useEffect(() => {
-    (async () => {
-      const { data, error } = await supabase.auth.getSession();
-      setStatus(error ? `Error: ${error.message}` : "Supabase OK ✅");
-    })();
-  }, []);
+    if (isLoading) return
+
+    async function redirect() {
+      // Prima, prova l'ultima pagina aperta
+      const lastId = await getSetting('lastOpenedPageId')
+      if (lastId) {
+        const exists = pages.find(p => p.id === lastId && !p.isDeleted)
+        if (exists) {
+          router.replace(`/page/${lastId}`)
+          return
+        }
+      }
+
+      // Poi, prima pagina root non eliminata
+      const first = pages.find(p => !p.isDeleted && p.parentId === null)
+      if (first) {
+        router.replace(`/page/${first.id}`)
+        return
+      }
+
+      // Nessuna pagina ancora — aspetta la creazione automatica della pagina di benvenuto
+      setTimeout(redirect, 150)
+    }
+
+    redirect()
+  }, [isLoading, pages, router])
 
   return (
-    <main style={{ padding: 24 }}>
-      <h1>Quiz App</h1>
-      <p>{status}</p>
-    </main>
-  );
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: '100vh',
+      color: 'var(--text-tertiary)',
+      fontSize: 14,
+    }}>
+      Caricamento...
+    </div>
+  )
 }
