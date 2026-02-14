@@ -5,6 +5,7 @@ import { Tldraw, type Editor } from 'tldraw'
 import 'tldraw/tldraw.css'
 import { usePagesContext } from '@/lib/context'
 import type { CanvasSnapshot } from '@/lib/types'
+import { CanvasToolbar } from './CanvasToolbar'
 
 interface Props {
   pageId: string
@@ -64,7 +65,7 @@ export function Canvas({ pageId }: Props) {
         key={pageId}
         onMount={handleMount}
         inferDarkMode
-        hideUi={false}
+        components={{ Toolbar: CanvasToolbar }}
       />
     </div>
   )
