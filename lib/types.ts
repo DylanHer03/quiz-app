@@ -1,4 +1,5 @@
-import type { JSONContent } from '@tiptap/react'
+// Snapshot del canvas tldraw (contenuto di ogni pagina)
+export type CanvasSnapshot = Record<string, unknown> | null
 
 export type TagColor =
   | 'gray'
@@ -20,15 +21,15 @@ export interface Page {
   id: string
   parentId: string | null
   title: string
-  icon: string            // emoji, es. "📝" — vuoto se nessuna icona
-  content: JSONContent    // documento Tiptap in formato JSON
-  createdAt: number       // timestamp ms
+  icon: string
+  content: CanvasSnapshot  // snapshot tldraw
+  createdAt: number
   updatedAt: number
   isDeleted: boolean
   deletedAt?: number
   isFavorite: boolean
-  tags: string[]          // array di Tag.id
-  childrenOrder: string[] // ID figli in ordine di visualizzazione
+  tags: string[]
+  childrenOrder: string[]
 }
 
 export interface AppSettings {

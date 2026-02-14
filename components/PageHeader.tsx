@@ -3,8 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { usePagesContext } from '@/lib/context'
 import type { Page } from '@/lib/types'
-import { downloadMarkdown } from '@/lib/markdown'
-import { Smile, Star, Download, X } from 'lucide-react'
+import { Smile, Star, X } from 'lucide-react'
 
 // ── Emoji picker ──────────────────────────────────────
 
@@ -91,10 +90,7 @@ export function PageHeader({ page }: Props) {
   }
 
   function handleTitleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      document.querySelector<HTMLElement>('.ProseMirror')?.focus()
-    }
+    if (e.key === 'Enter') e.preventDefault()
   }
 
   return (
@@ -127,14 +123,6 @@ export function PageHeader({ page }: Props) {
           <span>{page.isFavorite ? 'Rimuovi preferito' : 'Preferito'}</span>
         </button>
 
-        <button
-          className="page-toolbar-btn"
-          onClick={() => downloadMarkdown(page.title || 'nota', page.content)}
-          title="Esporta come Markdown"
-        >
-          <Download size={14} strokeWidth={1.8} />
-          <span>Esporta MD</span>
-        </button>
       </div>
 
       {/* Emoji grande */}

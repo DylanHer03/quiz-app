@@ -7,7 +7,7 @@ import { setSetting } from '@/lib/db'
 import { AppDock } from '@/components/AppDock'
 import { Sidebar } from '@/components/Sidebar'
 import { PageHeader } from '@/components/PageHeader'
-import { Editor } from '@/components/Editor'
+import { Canvas } from '@/components/Canvas'
 import { SearchModal } from '@/components/SearchModal'
 import { useKeyDown } from '@/lib/hooks'
 import { PanelLeft, Search } from 'lucide-react'
@@ -103,7 +103,11 @@ export default function NotesPage({ params }: Props) {
         </div>
 
         <PageHeader page={page} />
-        <Editor page={page} />
+
+        {/* Canvas fills remaining space */}
+        <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+          <Canvas pageId={id} />
+        </div>
       </main>
 
       {searchOpen && <SearchModal onClose={() => setSearchOpen(false)} />}

@@ -75,78 +75,6 @@ function sortedChildren(pages: Page[], parentId: string | null): Page[] {
   return children.sort((a, b) => a.createdAt - b.createdAt)
 }
 
-// ── Contenuto iniziale benvenuto ───────────────────────
-
-function welcomeContent() {
-  return {
-    type: 'doc',
-    content: [
-      {
-        type: 'heading',
-        attrs: { level: 1 },
-        content: [{ type: 'text', text: 'Benvenuto in Nota 👋' }],
-      },
-      {
-        type: 'paragraph',
-        content: [
-          {
-            type: 'text',
-            text: 'Questa è la tua prima nota. Inizia a scrivere o digita ',
-          },
-          { type: 'text', marks: [{ type: 'code' }], text: '/' },
-          { type: 'text', text: ' per inserire un nuovo blocco.' },
-        ],
-      },
-      {
-        type: 'heading',
-        attrs: { level: 2 },
-        content: [{ type: 'text', text: 'Cosa puoi fare' }],
-      },
-      {
-        type: 'bulletList',
-        content: [
-          {
-            type: 'listItem',
-            content: [
-              {
-                type: 'paragraph',
-                content: [{ type: 'text', text: 'Creare pagine e sotto-pagine nella sidebar' }],
-              },
-            ],
-          },
-          {
-            type: 'listItem',
-            content: [
-              {
-                type: 'paragraph',
-                content: [{ type: 'text', text: 'Usare comandi slash (/) per inserire blocchi' }],
-              },
-            ],
-          },
-          {
-            type: 'listItem',
-            content: [
-              {
-                type: 'paragraph',
-                content: [{ type: 'text', text: 'Cercare in tutte le note con Ctrl+K' }],
-              },
-            ],
-          },
-          {
-            type: 'listItem',
-            content: [
-              {
-                type: 'paragraph',
-                content: [{ type: 'text', text: 'Esportare le note in Markdown' }],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  }
-}
-
 // ── Provider ───────────────────────────────────────────
 
 export function PagesProvider({ children }: { children: React.ReactNode }) {
@@ -201,13 +129,7 @@ export function PagesProvider({ children }: { children: React.ReactNode }) {
     (query: string): Page[] => {
       if (!query.trim()) return []
       const q = query.toLowerCase()
-      return pages.filter(p => {
-        if (p.isDeleted) return false
-        if (p.title.toLowerCase().includes(q)) return true
-        // Cerca nel contenuto testuale
-        const text = extractText(p.content)
-        return text.toLowerCase().includes(q)
-      })
+      return pages.filter(p => !p.isDeleted && p.title.toLowerCase().includes(q))
     },
     [pages]
   )
@@ -221,7 +143,7 @@ export function PagesProvider({ children }: { children: React.ReactNode }) {
       parentId,
       title: '',
       icon: '',
-      content: { type: 'doc', content: [{ type: 'paragraph' }] },
+      content: null,
       createdAt: now,
       updatedAt: now,
       isDeleted: false,
@@ -395,7 +317,7 @@ export function PagesProvider({ children }: { children: React.ReactNode }) {
         parentId: null,
         title: 'Benvenuto in Nota',
         icon: '👋',
-        content: welcomeContent(),
+        content: null,
         createdAt: now,
         updatedAt: now,
         isDeleted: false,
@@ -439,16 +361,3 @@ export function PagesProvider({ children }: { children: React.ReactNode }) {
   return <PagesContext.Provider value={value}>{children}</PagesContext.Provider>
 }
 
-// ── Helper: estrae testo dal contenuto Tiptap ─────────
-
-function extractText(content: unknown): string {
-  if (!content || typeof content !== 'object') return ''
-  const node = content as { text?: string; content?: unknown[] }
-  let text = node.text ?? ''
-  if (node.content) {
-    for (const child of node.content) {
-      text += ' ' + extractText(child)
-    }
-  }
-  return text
-}
