@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePagesContext } from '@/lib/context'
 import type { Page } from '@/lib/types'
+import { ChevronRight, File, Star, Plus, Trash2 } from 'lucide-react'
 
 interface Props {
   page: Page
@@ -24,12 +25,12 @@ export function PageTreeItem({ page, currentPageId, depth }: Props) {
     e.stopPropagation()
     const newId = await createPage(page.id)
     setExpanded(true)
-    router.push(`/page/${newId}`)
+    router.push(`/notes/${newId}`)
   }
 
   async function handleTrash(e: React.MouseEvent) {
     e.stopPropagation()
-    if (isActive) router.push('/')
+    if (isActive) router.push('/notes')
     await trashPage(page.id)
   }
 
@@ -45,9 +46,9 @@ export function PageTreeItem({ page, currentPageId, depth }: Props) {
       <div
         className={`sidebar-item ${isActive ? 'active' : ''}`}
         style={{ paddingLeft: 8 + indent }}
-        onClick={() => router.push(`/page/${page.id}`)}
+        onClick={() => router.push(`/notes/${page.id}`)}
       >
-        {/* Toggle expand */}
+        {/* Expand toggle */}
         <button
           className="sidebar-action-btn"
           style={{
@@ -57,17 +58,16 @@ export function PageTreeItem({ page, currentPageId, depth }: Props) {
             transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)',
             transition: 'transform 0.15s ease',
           }}
-          onClick={e => {
-            e.stopPropagation()
-            setExpanded(v => !v)
-          }}
+          onClick={e => { e.stopPropagation(); setExpanded(v => !v) }}
         >
-          ▶
+          <ChevronRight size={12} strokeWidth={2.5} />
         </button>
 
-        {/* Icona pagina */}
+        {/* Page icon — emoji se impostata, altrimenti File icon */}
         <span className="sidebar-item-icon" style={{ color: 'inherit' }}>
-          {page.icon || '📄'}
+          {page.icon
+            ? <span style={{ fontSize: 13, lineHeight: 1 }}>{page.icon}</span>
+            : <File size={13} strokeWidth={1.8} />}
         </span>
 
         {/* Titolo */}
@@ -75,34 +75,36 @@ export function PageTreeItem({ page, currentPageId, depth }: Props) {
           {page.title || 'Senza titolo'}
         </span>
 
-        {/* Azioni (visibili al hover) */}
+        {/* Azioni hover */}
         <span className="sidebar-item-actions">
           <button
             className="sidebar-action-btn"
             onClick={handleFavorite}
             title={page.isFavorite ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}
           >
-            {page.isFavorite ? '★' : '☆'}
+            <Star
+              size={12}
+              strokeWidth={2}
+              fill={page.isFavorite ? 'currentColor' : 'none'}
+            />
           </button>
           <button
             className="sidebar-action-btn"
             onClick={handleNewSubpage}
             title="Nuova sotto-pagina"
           >
-            +
+            <Plus size={12} strokeWidth={2.5} />
           </button>
           <button
             className="sidebar-action-btn"
             onClick={handleTrash}
             title="Sposta nel cestino"
-            style={{ color: 'var(--text-tertiary)' }}
           >
-            🗑
+            <Trash2 size={12} strokeWidth={1.8} />
           </button>
         </span>
       </div>
 
-      {/* Figli */}
       {expanded && hasChildren && (
         <div>
           {children.map(child => (

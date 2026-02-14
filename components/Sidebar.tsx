@@ -6,6 +6,7 @@ import { useTheme } from 'next-themes'
 import { usePagesContext } from '@/lib/context'
 import { PageTreeItem } from './PageTreeItem'
 import { TrashView } from './TrashView'
+import { Search, Plus, Trash2, Sun, Moon, X } from 'lucide-react'
 
 interface Props {
   currentPageId: string
@@ -22,66 +23,68 @@ export function Sidebar({ currentPageId, isOpen, onToggle, onSearch }: Props) {
 
   async function handleNewPage() {
     const newId = await createPage(null)
-    router.push(`/page/${newId}`)
+    router.push(`/notes/${newId}`)
   }
 
   return (
     <aside className={`sidebar ${isOpen ? '' : 'collapsed'}`}>
-      {/* Header sidebar */}
+      {/* Header */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '10px 12px',
         flexShrink: 0,
+        height: 42,
       }}>
         <span style={{
-          fontSize: 14,
+          fontSize: 13,
           fontWeight: 600,
           color: 'var(--text-primary)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
+          letterSpacing: '-0.01em',
         }}>
-          📝 Nota
+          Note
         </span>
         <button
           onClick={onToggle}
           className="sidebar-action-btn"
           title="Chiudi sidebar"
         >
-          ✕
+          <X size={14} strokeWidth={2} />
         </button>
       </div>
 
-      {/* Barra di ricerca */}
-      <div style={{ padding: '0 8px 4px' }}>
+      {/* Cerca */}
+      <div style={{ padding: '0 8px 2px' }}>
         <button
           className="sidebar-item"
           style={{ width: '100%', border: 'none', textAlign: 'left' }}
           onClick={onSearch}
         >
-          <span className="sidebar-item-icon">🔍</span>
+          <span className="sidebar-item-icon">
+            <Search size={14} strokeWidth={2} />
+          </span>
           <span className="sidebar-item-label">Cerca...</span>
-          <span style={{ fontSize: 11, color: 'var(--text-tertiary)', flexShrink: 0 }}>Ctrl+K</span>
+          <span style={{ fontSize: 10, color: 'var(--text-tertiary)', flexShrink: 0 }}>⌘K</span>
         </button>
       </div>
 
       {/* Nuova pagina */}
-      <div style={{ padding: '0 8px 8px' }}>
+      <div style={{ padding: '0 8px 6px' }}>
         <button
           className="sidebar-item"
           style={{ width: '100%', border: 'none', textAlign: 'left' }}
           onClick={handleNewPage}
         >
-          <span className="sidebar-item-icon">+</span>
+          <span className="sidebar-item-icon">
+            <Plus size={14} strokeWidth={2} />
+          </span>
           <span className="sidebar-item-label">Nuova pagina</span>
         </button>
       </div>
 
-      {/* Scrollable area */}
+      {/* Albero pagine */}
       <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
-        {/* Preferiti */}
         {favoritePages.length > 0 && (
           <div className="sidebar-section">
             <div className="sidebar-label">Preferiti</div>
@@ -96,11 +99,8 @@ export function Sidebar({ currentPageId, isOpen, onToggle, onSearch }: Props) {
           </div>
         )}
 
-        {/* Pagine */}
         <div className="sidebar-section">
-          {favoritePages.length > 0 && (
-            <div className="sidebar-label">Pagine</div>
-          )}
+          {favoritePages.length > 0 && <div className="sidebar-label">Pagine</div>}
           {rootPages.map(page => (
             <PageTreeItem
               key={page.id}
@@ -111,9 +111,9 @@ export function Sidebar({ currentPageId, isOpen, onToggle, onSearch }: Props) {
           ))}
           {rootPages.length === 0 && (
             <div style={{
-              fontSize: 13,
+              fontSize: 12,
               color: 'var(--text-tertiary)',
-              padding: '8px 8px',
+              padding: '6px 10px',
               fontStyle: 'italic',
             }}>
               Nessuna pagina
@@ -124,31 +124,33 @@ export function Sidebar({ currentPageId, isOpen, onToggle, onSearch }: Props) {
 
       {/* Footer */}
       <div style={{
-        padding: '8px',
+        padding: '6px 8px',
         borderTop: '1px solid var(--border)',
         flexShrink: 0,
         display: 'flex',
         flexDirection: 'column',
         gap: 2,
       }}>
-        {/* Cestino */}
         <button
           className="sidebar-item"
           style={{ width: '100%', border: 'none', textAlign: 'left' }}
           onClick={() => setShowTrash(true)}
         >
-          <span className="sidebar-item-icon">🗑</span>
+          <span className="sidebar-item-icon">
+            <Trash2 size={14} strokeWidth={1.8} />
+          </span>
           <span className="sidebar-item-label">Cestino</span>
         </button>
 
-        {/* Toggle tema */}
         <button
           className="sidebar-item"
           style={{ width: '100%', border: 'none', textAlign: 'left' }}
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         >
           <span className="sidebar-item-icon">
-            {theme === 'dark' ? '☀️' : '🌙'}
+            {theme === 'dark'
+              ? <Sun size={14} strokeWidth={1.8} />
+              : <Moon size={14} strokeWidth={1.8} />}
           </span>
           <span className="sidebar-item-label">
             {theme === 'dark' ? 'Tema chiaro' : 'Tema scuro'}
@@ -156,7 +158,6 @@ export function Sidebar({ currentPageId, isOpen, onToggle, onSearch }: Props) {
         </button>
       </div>
 
-      {/* Trash drawer */}
       {showTrash && <TrashView onClose={() => setShowTrash(false)} />}
     </aside>
   )

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePagesContext } from '@/lib/context'
+import { Search, X, File } from 'lucide-react'
 
 interface Props {
   onClose: () => void
@@ -19,13 +20,8 @@ export function SearchModal({ onClose }: Props) {
     ? searchPages(query)
     : pages.filter(p => !p.isDeleted).sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 8)
 
-  useEffect(() => {
-    inputRef.current?.focus()
-  }, [])
-
-  useEffect(() => {
-    setSelectedIndex(0)
-  }, [query])
+  useEffect(() => { inputRef.current?.focus() }, [])
+  useEffect(() => { setSelectedIndex(0) }, [query])
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'ArrowDown') {
@@ -43,7 +39,7 @@ export function SearchModal({ onClose }: Props) {
   }
 
   function navigate(id: string) {
-    router.push(`/page/${id}`)
+    router.push(`/notes/${id}`)
     onClose()
   }
 
@@ -52,7 +48,7 @@ export function SearchModal({ onClose }: Props) {
       <div className="search-modal" onClick={e => e.stopPropagation()}>
         {/* Input */}
         <div className="search-input-row">
-          <span style={{ color: 'var(--text-tertiary)', fontSize: 16 }}>🔍</span>
+          <Search size={15} strokeWidth={2} style={{ color: 'var(--text-tertiary)', flexShrink: 0 }} />
           <input
             ref={inputRef}
             className="search-input"
@@ -64,16 +60,10 @@ export function SearchModal({ onClose }: Props) {
           {query && (
             <button
               onClick={() => setQuery('')}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                color: 'var(--text-tertiary)',
-                fontSize: 14,
-                padding: 0,
-              }}
+              className="sidebar-action-btn"
+              style={{ width: 20, height: 20, flexShrink: 0 }}
             >
-              ✕
+              <X size={12} strokeWidth={2.5} />
             </button>
           )}
         </div>
@@ -106,7 +96,9 @@ export function SearchModal({ onClose }: Props) {
                   onMouseEnter={() => setSelectedIndex(i)}
                 >
                   <span className="search-result-icon">
-                    {page.icon || '📄'}
+                    {page.icon
+                      ? <span style={{ fontSize: 16 }}>{page.icon}</span>
+                      : <File size={16} strokeWidth={1.5} style={{ color: 'var(--text-tertiary)' }} />}
                   </span>
                   <span className="search-result-title">
                     {page.title || 'Senza titolo'}
@@ -117,7 +109,7 @@ export function SearchModal({ onClose }: Props) {
           )}
         </div>
 
-        {/* Footer hint */}
+        {/* Footer */}
         <div style={{
           padding: '8px 16px',
           borderTop: '1px solid var(--border)',

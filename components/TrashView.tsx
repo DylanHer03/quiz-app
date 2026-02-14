@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { usePagesContext } from '@/lib/context'
+import { Trash2, RotateCcw, X, File } from 'lucide-react'
 
 interface Props {
   onClose: () => void
@@ -42,21 +43,23 @@ export function TrashView({ onClose }: Props) {
           borderBottom: '1px solid var(--border)',
           flexShrink: 0,
         }}>
-          <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--text-primary)' }}>
-            🗑 Cestino
+          <span style={{
+            fontWeight: 600,
+            fontSize: 14,
+            color: 'var(--text-primary)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+          }}>
+            <Trash2 size={15} strokeWidth={1.8} />
+            Cestino
           </span>
           <button
             onClick={onClose}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: 'var(--text-tertiary)',
-              fontSize: 18,
-              padding: 0,
-            }}
+            className="sidebar-action-btn"
+            style={{ width: 24, height: 24 }}
           >
-            ✕
+            <X size={14} strokeWidth={2} />
           </button>
         </div>
 
@@ -67,7 +70,7 @@ export function TrashView({ onClose }: Props) {
               textAlign: 'center',
               padding: 40,
               color: 'var(--text-tertiary)',
-              fontSize: 14,
+              fontSize: 13,
             }}>
               Il cestino è vuoto
             </div>
@@ -83,10 +86,12 @@ export function TrashView({ onClose }: Props) {
                   borderRadius: 6,
                 }}
               >
-                <span style={{ fontSize: 18 }}>{page.icon || '📄'}</span>
+                <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0 }}>
+                  {page.icon || <File size={16} strokeWidth={1.5} style={{ color: 'var(--text-tertiary)' }} />}
+                </span>
                 <span style={{
                   flex: 1,
-                  fontSize: 14,
+                  fontSize: 13,
                   color: 'var(--text-primary)',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -97,10 +102,13 @@ export function TrashView({ onClose }: Props) {
                 <button
                   onClick={async () => {
                     await restorePage(page.id)
-                    router.push(`/page/${page.id}`)
+                    router.push(`/notes/${page.id}`)
                     onClose()
                   }}
                   style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
                     background: 'transparent',
                     border: '1px solid var(--border)',
                     borderRadius: 5,
@@ -111,6 +119,7 @@ export function TrashView({ onClose }: Props) {
                     flexShrink: 0,
                   }}
                 >
+                  <RotateCcw size={11} strokeWidth={2} />
                   Ripristina
                 </button>
                 <button
@@ -120,6 +129,9 @@ export function TrashView({ onClose }: Props) {
                     }
                   }}
                   style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
                     background: 'transparent',
                     border: '1px solid var(--border)',
                     borderRadius: 5,
@@ -130,6 +142,7 @@ export function TrashView({ onClose }: Props) {
                     flexShrink: 0,
                   }}
                 >
+                  <Trash2 size={11} strokeWidth={1.8} />
                   Elimina
                 </button>
               </div>

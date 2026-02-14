@@ -4,8 +4,9 @@ import { useState, useRef, useEffect } from 'react'
 import { usePagesContext } from '@/lib/context'
 import type { Page } from '@/lib/types'
 import { downloadMarkdown } from '@/lib/markdown'
+import { Smile, Star, Download, X } from 'lucide-react'
 
-// ── Emoji picker minimale ─────────────────────────────
+// ── Emoji picker ──────────────────────────────────────
 
 const EMOJIS = [
   '📝','📄','📃','📋','📌','📍','🗒','🗓',
@@ -53,9 +54,9 @@ function EmojiPicker({
             className="emoji-btn"
             onClick={() => { onSelect(''); onClose() }}
             title="Rimuovi icona"
-            style={{ fontSize: 14, color: 'var(--text-tertiary)' }}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
-            ✕
+            <X size={12} strokeWidth={2.5} style={{ color: 'var(--text-tertiary)' }} />
           </button>
         </div>
       </div>
@@ -75,7 +76,6 @@ export function PageHeader({ page }: Props) {
   const iconRef = useRef<HTMLButtonElement>(null)
   const titleRef = useRef<HTMLTextAreaElement>(null)
 
-  // Auto-resize textarea del titolo
   useEffect(() => {
     const el = titleRef.current
     if (!el) return
@@ -93,78 +93,51 @@ export function PageHeader({ page }: Props) {
   function handleTitleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Enter') {
       e.preventDefault()
-      // Sposta il focus sull'editor
-      const editor = document.querySelector<HTMLElement>('.ProseMirror')
-      editor?.focus()
+      document.querySelector<HTMLElement>('.ProseMirror')?.focus()
     }
-  }
-
-  async function handleIconSelect(emoji: string) {
-    await updatePage(page.id, { icon: emoji })
   }
 
   return (
     <div className="page-header">
-      {/* Toolbar header (icona, preferiti, export) */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 8,
-        marginBottom: 8,
-        opacity: 0,
-        transition: 'opacity 0.15s ease',
-      }}
-        onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
-        onMouseLeave={e => (e.currentTarget.style.opacity = '0')}
+      {/* Toolbar (appare all'hover) */}
+      <div
+        className="page-toolbar"
+        style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 10 }}
       >
         <button
           ref={iconRef as React.RefObject<HTMLButtonElement>}
+          className="page-toolbar-btn"
           onClick={() => setEmojiOpen(v => !v)}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-            fontSize: 12,
-            color: 'var(--text-tertiary)',
-            padding: '3px 6px',
-            borderRadius: 4,
-          }}
+          title={page.icon ? 'Cambia icona' : 'Aggiungi icona'}
         >
-          {page.icon ? '✏️ Cambia icona' : '😀 Aggiungi icona'}
+          <Smile size={14} strokeWidth={1.8} />
+          <span>{page.icon ? 'Cambia icona' : 'Aggiungi icona'}</span>
         </button>
 
         <button
+          className="page-toolbar-btn"
           onClick={() => toggleFavorite(page.id)}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-            fontSize: 12,
-            color: 'var(--text-tertiary)',
-            padding: '3px 6px',
-            borderRadius: 4,
-          }}
+          title={page.isFavorite ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}
         >
-          {page.isFavorite ? '★ Rimuovi preferito' : '☆ Aggiungi preferito'}
+          <Star
+            size={14}
+            strokeWidth={1.8}
+            fill={page.isFavorite ? 'currentColor' : 'none'}
+          />
+          <span>{page.isFavorite ? 'Rimuovi preferito' : 'Preferito'}</span>
         </button>
 
         <button
+          className="page-toolbar-btn"
           onClick={() => downloadMarkdown(page.title || 'nota', page.content)}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-            fontSize: 12,
-            color: 'var(--text-tertiary)',
-            padding: '3px 6px',
-            borderRadius: 4,
-          }}
+          title="Esporta come Markdown"
         >
-          ⬇️ Esporta MD
+          <Download size={14} strokeWidth={1.8} />
+          <span>Esporta MD</span>
         </button>
       </div>
 
-      {/* Emoji icona grande */}
+      {/* Emoji grande */}
       {page.icon && (
         <button
           ref={iconRef as React.RefObject<HTMLButtonElement>}
@@ -179,7 +152,7 @@ export function PageHeader({ page }: Props) {
       {emojiOpen && (
         <EmojiPicker
           anchorRef={iconRef}
-          onSelect={handleIconSelect}
+          onSelect={emoji => updatePage(page.id, { icon: emoji })}
           onClose={() => setEmojiOpen(false)}
         />
       )}

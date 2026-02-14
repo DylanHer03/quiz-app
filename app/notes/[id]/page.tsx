@@ -1,21 +1,22 @@
 'use client'
 
-import { use, useEffect } from 'react'
+import { use, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePagesContext } from '@/lib/context'
 import { setSetting } from '@/lib/db'
+import { AppDock } from '@/components/AppDock'
 import { Sidebar } from '@/components/Sidebar'
 import { PageHeader } from '@/components/PageHeader'
 import { Editor } from '@/components/Editor'
 import { SearchModal } from '@/components/SearchModal'
 import { useKeyDown } from '@/lib/hooks'
-import { useState } from 'react'
+import { PanelLeft, Search } from 'lucide-react'
 
 interface Props {
   params: Promise<{ id: string }>
 }
 
-export default function PageView({ params }: Props) {
+export default function NotesPage({ params }: Props) {
   const { id } = use(params)
   const router = useRouter()
   const { getPage, isLoading } = usePagesContext()
@@ -24,19 +25,14 @@ export default function PageView({ params }: Props) {
 
   const page = getPage(id)
 
-  // Salva ultima pagina aperta
   useEffect(() => {
     if (id) setSetting('lastOpenedPageId', id)
   }, [id])
 
-  // Ctrl+K apre la ricerca
   useKeyDown('k', () => setSearchOpen(true), { ctrl: true })
 
-  // Redirect se la pagina non esiste dopo il caricamento
   useEffect(() => {
-    if (!isLoading && !page) {
-      router.replace('/')
-    }
+    if (!isLoading && !page) router.replace('/notes')
   }, [isLoading, page, router])
 
   if (isLoading || !page) {
@@ -56,6 +52,8 @@ export default function PageView({ params }: Props) {
 
   return (
     <div className="app-layout">
+      <AppDock />
+
       <Sidebar
         currentPageId={id}
         isOpen={sidebarOpen}
@@ -64,52 +62,44 @@ export default function PageView({ params }: Props) {
       />
 
       <main className="main-content">
-        {/* Toolbar top-right */}
+        {/* Topbar */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '8px 16px',
+          padding: '6px 12px',
           borderBottom: '1px solid var(--border)',
           flexShrink: 0,
+          height: 42,
         }}>
           <button
             onClick={() => setSidebarOpen(o => !o)}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: 'var(--text-tertiary)',
-              padding: '4px 6px',
-              borderRadius: 4,
-              fontSize: 16,
-            }}
-            title="Mostra/Nascondi sidebar"
+            className="sidebar-action-btn"
+            title={sidebarOpen ? 'Chiudi sidebar' : 'Apri sidebar'}
+            style={{ width: 30, height: 30 }}
           >
-            ☰
+            <PanelLeft size={16} strokeWidth={1.8} />
           </button>
 
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <button
-              onClick={() => setSearchOpen(true)}
-              style={{
-                background: 'transparent',
-                border: '1px solid var(--border)',
-                cursor: 'pointer',
-                color: 'var(--text-tertiary)',
-                padding: '4px 12px',
-                borderRadius: 6,
-                fontSize: 12,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-              }}
-            >
-              <span>🔍</span>
-              <span>Cerca</span>
-              <span style={{ opacity: 0.6, fontSize: 11 }}>Ctrl+K</span>
-            </button>
-          </div>
+          <button
+            onClick={() => setSearchOpen(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              background: 'transparent',
+              border: '1px solid var(--border)',
+              borderRadius: 6,
+              padding: '4px 10px',
+              cursor: 'pointer',
+              color: 'var(--text-tertiary)',
+              fontSize: 12,
+            }}
+          >
+            <Search size={13} strokeWidth={2} />
+            <span>Cerca</span>
+            <span style={{ opacity: 0.5, fontSize: 11 }}>Ctrl+K</span>
+          </button>
         </div>
 
         <PageHeader page={page} />
